@@ -14,8 +14,14 @@ function NavigationBar() {
             <Nav.Link as={NavLink} to="/" end>
               Home
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/about">
-              About
+            <Nav.Link as={NavLink} to="/planner">
+              Trips
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/notes">
+              Notes
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/budget">
+              Budget
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
