@@ -1,0 +1,67 @@
+.app-main {
+  flex: 1;
+}
+
+.counter {
+  font-size: 16px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-top: 20px;
+}
+
+.hero-section {
+  padding: 48px 20px;
+  text-align: center;
+}
+
+#next-steps {
+  display: flex;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+
+#next-steps > div {
+  flex: 1 1 0;
+  padding: 32px;
+}
+
+#docs {
+  border-right: 1px solid var(--border);
+}
+
+.cards-section {
+  padding: 32px 20px 40px;
+  border-top: 1px solid var(--border);
+}
+
+.cards-title {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.about-page {
+  padding: 32px 20px 48px;
+  text-align: left;
+}
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 20px;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  #next-steps {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  #next-steps > div {
+    padding: 24px 20px;
+  }
+
+  #docs {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
