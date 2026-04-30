@@ -1,42 +1,83 @@
-import { Button, Card, Form } from 'react-bootstrap'
+import { useState } from 'react'
+import { Alert, Button, Card, Form } from 'react-bootstrap'
 
-function TripForm({ trip, onTripChange, onSave }) {
+function TripForm({
+  title,
+  fields,
+  values,
+  onChange,
+  onSubmit,
+  submitLabel = 'Submit',
+}) {
+  const [error, setError] = useState('')
+
   function handleChange(event) {
     const { name, value } = event.target
-    onTripChange({
-      ...trip,
+
+    onChange({
+      ...values,
       [name]: value,
     })
+
+    if (error) setError('')
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault()
+
+    for (let field of fields) {
+      if (field.required && !values[field.name]?.trim()) {
+        setError(field.errorMessage || `Please fill out ${field.label}.`)
+        return
+      }
+    }
+
+    setError('')
+    onSubmit()
   }
 
   return (
     <Card className="shadow-sm h-100">
       <Card.Body>
-        <Card.Title>Build a Trip</Card.Title>
-        <Form onSubmit={onSave}>
-          <Form.Group className="mb-3" controlId="destination">
-            <Form.Label>Destination</Form.Label>
-            <Form.Control
-              name="destination"
-              value={trip.destination}
-              onChange={handleChange}
-              placeholder="Madison, WI"
-            />
-          </Form.Group>
+        <Card.Title>{title}</Card.Title>
 
-          <Form.Group className="mb-3" controlId="dates">
-            <Form.Label>Dates</Form.Label>
-            <Form.Control
-              name="dates"
-              value={trip.dates}
-              onChange={handleChange}
-              placeholder="May 10 - May 14"
-            />
-          </Form.Group>   
+        {error && (
+          <Alert variant="danger" className="py-2">
+            {error}
+          </Alert>
+        )}
 
+        <Form onSubmit={handleSubmit}>
+          {fields.map((field) => (
+            <Form.Group className="mb-3" key={field.name}>
+              <Form.Label>{field.label}</Form.Label>
+
+              {field.type === 'select' ? (
+                <Form.Select
+                  name={field.name}
+                  value={values[field.name]}
+                  onChange={handleChange}
+                >
+                  <option value="">Select {field.label}</option>
+                  {field.options.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </Form.Select>
+              ) : (
+                <Form.Control
+                  type={field.type || 'text'}
+                  name={field.name}
+                  value={values[field.name]}
+                  onChange={handleChange}
+                />
+              )}
+            </Form.Group>
+          ))}
 
           <Button type="submit" variant="success">
-            Save Draft
+            {submitLabel}
           </Button>
         </Form>
       </Card.Body>

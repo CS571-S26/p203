@@ -1,26 +1,21 @@
 import { useState } from 'react'
 import { Button, Card, Col, Form, Row } from 'react-bootstrap'
+import AddNote from '../components/AddNote'
+import EmptyState from '../components/EmptyState'
 
 function NotesPage() {
-  const [note, setNote] = useState('')
-  const [notes, setNotes] = useState([
-    'Look up food options near the hotel.',
-    'Check whether the museum needs advance tickets.',
-  ])
+  const username = localStorage.getItem('username')
+  const notesKey = username ? `notes-${username}` : 'notes-guest'
 
-  function handleSubmit(event) {
-    event.preventDefault()
+  const [notes, setNotes] = useState(() => {
+    const savedNotes = localStorage.getItem(notesKey)
+    return savedNotes ? JSON.parse(savedNotes) : []
+  })
 
-    if (!note.trim()) {
-      return
-    }
-
-    setNotes([note, ...notes])
-    setNote('')
-  }
-
-  function clearNotes() {
-    setNotes([])
+  function removeNote(indexToRemove) {
+    const updatedNotes = notes.filter((_, index) => index !== indexToRemove)
+    setNotes(updatedNotes)
+    localStorage.setItem(notesKey, JSON.stringify(updatedNotes))
   }
 
   return (
@@ -32,50 +27,39 @@ function NotesPage() {
 
       <Row className="g-4 text-start">
         <Col lg={5}>
-          <Card className="shadow-sm h-100">
-            <Card.Body>
-              <Card.Title>Add a Thought</Card.Title>
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="quickNote">
-                  <Form.Label>Note</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={5}
-                    value={note}
-                    onChange={(event) => setNote(event.target.value)}
-                    placeholder="Write anything you want to remember..."
-                  />
-                </Form.Group>
-                <Button type="submit" variant="success" className="me-2">
-                  Add Note
-                </Button>
-                <Button type="button" variant="outline-secondary" onClick={clearNotes}>
-                  Clear All
-                </Button>
-              </Form>
-            </Card.Body>
-          </Card>
+          <AddNote
+            notesKey={notesKey}
+            notes={notes}
+            setNotes={setNotes}
+          />
         </Col>
 
         <Col lg={7}>
-          <Row className="g-3">
-            {notes.length === 0 && (
-              <Col>
-                <Card className="shadow-sm">
-                  <Card.Body>No notes yet.</Card.Body>
-                </Card>
-              </Col>
-            )}
-            {notes.map((savedNote, index) => (
-              <Col md={6} key={`${savedNote}-${index}`}>
-                <Card className="shadow-sm h-100">
-                  <Card.Body>
-                    <Card.Text>{savedNote}</Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+          {notes.length === 0 ? (
+            <EmptyState message="No notes yet. Add one to get started." />
+          ) : (
+            <Row className="g-3">
+              {notes.map((savedNote, index) => (
+                <Col md={6} key={`${savedNote}-${index}`}>
+                  <Card className="shadow-sm h-100">
+                    <Card.Body className="d-flex flex-column">
+                      <Card.Text className="flex-grow-1">
+                        {savedNote}
+                      </Card.Text>
+
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => removeNote(index)}
+                      >
+                        Remove
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
         </Col>
       </Row>
     </>

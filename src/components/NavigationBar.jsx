@@ -15,7 +15,7 @@ function NavigationBar() {
               Home
             </Nav.Link>
             <Nav.Link as={NavLink} to="/planner">
-              Trips
+              Overview
             </Nav.Link>
             <Nav.Link as={NavLink} to="/notes">
               Notes

@@ -12,7 +12,7 @@ export default function TripTips() {
         <ListGroup variant="flush">
           <ListGroup.Item>Don't underestimate transportation and food costs!</ListGroup.Item>
           <ListGroup.Item>Plan one step at a time! It's easy to get overwhelmed when planning</ListGroup.Item>
-          <ListGroup.Item>If travelling with others, make sure to be on the same page. (P.s. you can share this planner with them!)</ListGroup.Item>
+          <ListGroup.Item>If travelling with others, make sure to be on the same page.</ListGroup.Item>
         </ListGroup>
       </Card.Body>
     </Card>
