@@ -7,7 +7,7 @@ export default function HomePage() {
   const navigate = useNavigate()
   const [login, setLogin] = useState({ username: '', pin: '' })
   const [register, setRegister] = useState({ username: '', pin: '', confirmPin: '' })
-  const [loggedIn, setLoggedIn] = useState(localStorage.getItem('jwt') !== null)
+  const [loggedIn, setLoggedIn] = useState(localStorage.getItem('loggedIn') === 'true')
   const [isRegistering, setIsRegistering] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -38,47 +38,20 @@ export default function HomePage() {
   }
 
   function handleLogout() {
-    localStorage.removeItem('jwt')
-    localStorage.removeItem('username')
+    localStorage.removeItem('loggedIn')
     setLoggedIn(false)
     setLogin({ username: '', pin: '' })
     setMessage('')
   }
 
-  async function handleLogin(event) {
+  function handleLogin(event) {
     event.preventDefault()
 
-    if (!login.username || !login.pin) {
-      setMessage('Incorrect login, please try again.')
-      return
-    }
+    const savedUsername = localStorage.getItem('username')
+    const savedPin = localStorage.getItem('pin')
 
-    const res = await fetch(
-      'https://cs571api.cs.wisc.edu/rest/s26/hw9/login',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CS571-ID':
-            'bid_b01541dd706f906fa8b146c3650877da27beb733703ea15872ec0c8e42c52d56'
-        },
-        body: JSON.stringify({
-          username: login.username,
-          pin: login.pin
-        })
-      }
-    )
-
-    let data = null
-    try {
-      data = await res.json()
-    } catch (e) {
-      data = null
-    }
-
-    if (res.status === 200) {
-      localStorage.setItem('jwt', data.token)
-      localStorage.setItem('username', login.username)
+    if (login.username === savedUsername && login.pin === savedPin) {
+      localStorage.setItem('loggedIn', 'true')
       setLoggedIn(true)
       setMessage('')
     } else {
@@ -86,45 +59,18 @@ export default function HomePage() {
     }
   }
 
-  async function handleSignup(event) {
+  function handleSignup(event) {
     event.preventDefault()
 
     if (!isRegisterValid) return
 
-    const res = await fetch(
-      'https://cs571api.cs.wisc.edu/rest/s26/hw9/register',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CS571-ID':
-            'bid_b01541dd706f906fa8b146c3650877da27beb733703ea15872ec0c8e42c52d56'
-        },
-        body: JSON.stringify({
-          username: register.username,
-          pin: register.pin
-        })
-      }
-    )
+    localStorage.setItem('username', register.username)
+    localStorage.setItem('pin', register.pin)
+    localStorage.setItem('loggedIn', 'true')
 
-    let data = null
-    try {
-      data = await res.json()
-    } catch (e) {
-      data = null
-    }
-
-    if (res.status === 200) {
-      localStorage.setItem('jwt', data.token)
-      localStorage.setItem('username', register.username)
-      setLogin({ username: register.username, pin: register.pin })
-      setLoggedIn(true)
-      setMessage('')
-    } else if (res.status === 409) {
-      setMessage('That username is already taken.')
-    } else {
-      setMessage('Signup failed.')
-    }
+    setLogin({ username: register.username, pin: register.pin })
+    setLoggedIn(true)
+    setMessage('')
   }
 
   return (
@@ -136,16 +82,13 @@ export default function HomePage() {
           travel budgets in one simple place.
         </p>
       </section>
+
       <Row className="g-4 align-items-stretch text-start">
         <Col lg={6}>
           <Card className="shadow-sm h-100">
             <Card.Body>
               <Card.Title>
-                {loggedIn
-                  ? 'Account'
-                  : isRegistering
-                  ? 'Sign Up'
-                  : 'Log In'}
+                {loggedIn ? 'Account' : isRegistering ? 'Sign Up' : 'Log In'}
               </Card.Title>
 
               <Card.Text className="text-muted">
@@ -157,7 +100,7 @@ export default function HomePage() {
               {!loggedIn ? (
                 !isRegistering ? (
                   <Form onSubmit={handleLogin}>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3" controlId="loginUsername">
                       <Form.Label>Username</Form.Label>
                       <Form.Control
                         type="text"
@@ -168,7 +111,7 @@ export default function HomePage() {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3" controlId="loginPin">
                       <Form.Label>PIN</Form.Label>
                       <Form.Control
                         type="password"
@@ -192,7 +135,7 @@ export default function HomePage() {
                   </Form>
                 ) : (
                   <Form onSubmit={handleSignup}>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3" controlId="registerUsername">
                       <Form.Label>Username</Form.Label>
                       <Form.Control
                         type="text"
@@ -203,7 +146,7 @@ export default function HomePage() {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3" controlId="registerPin">
                       <Form.Label>PIN</Form.Label>
                       <Form.Control
                         type="password"
@@ -215,7 +158,7 @@ export default function HomePage() {
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3" controlId="registerConfirmPin">
                       <Form.Label>Confirm PIN</Form.Label>
                       <Form.Control
                         type="password"
@@ -227,9 +170,7 @@ export default function HomePage() {
                       />
                     </Form.Group>
 
-                    <p className="text-danger">
-                      {registerValidationMessage}
-                    </p>
+                    <p className="text-danger">{registerValidationMessage}</p>
 
                     <Button
                       type="submit"
@@ -265,16 +206,17 @@ export default function HomePage() {
             </Card.Body>
           </Card>
         </Col>
-      <Col lg={6}>
-        <TripTips />
-      </Col>
-      </Row>
+
+        <Col lg={6}>
+          <TripTips />
+        </Col>
+
         <Col lg={6}>
           <Card className="shadow-sm h-100">
             <Card.Body className="d-flex flex-column">
               <Card.Title>Trip Dashboard</Card.Title>
               <Card.Text className="flex-grow-1">
-                Click here to start planning your trip! 
+                Click here to start planning your trip!
               </Card.Text>
               <Button variant="primary" onClick={() => navigate('/planner')}>
                 Open Trip Overview
@@ -282,6 +224,7 @@ export default function HomePage() {
             </Card.Body>
           </Card>
         </Col>
+      </Row>
     </>
   )
 }

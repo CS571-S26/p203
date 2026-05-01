@@ -49,7 +49,7 @@ function TripForm({
 
         <Form onSubmit={handleSubmit}>
           {fields.map((field) => (
-            <Form.Group className="mb-3" key={field.name}>
+            <Form.Group className="mb-3" key={field.name} controlId={`tripForm${field.name}`}>
               <Form.Label>{field.label}</Form.Label>
 
               {field.type === 'select' ? (

@@ -21,7 +21,7 @@ function AddNote({ notesKey, notes, setNotes }) {
         <Card.Title>Add a Note</Card.Title>
 
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3" controlId="noteTextarea">
             <Form.Label>Note</Form.Label>
             <Form.Control
               as="textarea"
